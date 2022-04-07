@@ -19,7 +19,7 @@ rm -f /var/log/cdrom-mount.track*
 # Remove udev rule
 sed -i "/systemctl\sstart\susb-mount/d" /etc/udev/rules.d/99-local.rules
 sed -i "/systemctl\sstop\susb-mount/d" /etc/udev/rules.d/99-local.rules
-sed -i "/systemctl\scdrom-mount/d" /etc/udev/rules.d/99-local.rules
+sed -i "/systemctl\sstart\scdrom-mount/d" /etc/udev/rules.d/99-local.rules
 
 systemctl daemon-reload
 udevadm control --reload-rules
