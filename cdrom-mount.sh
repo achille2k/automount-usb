@@ -12,6 +12,18 @@
 PATH="$PATH:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin:/bin:/sbin"
 log="logger -t cdrom-mount.sh -s "
 
+usage()
+{
+    ${log} "Usage: $0 {add|remove} device_name (e.g. sr0)"
+    exit 1
+}
+
+if [[ $# -ne 2 ]]; then
+    usage
+fi
+
+
+ACTION=$1
 DEVBASE=$2
 DEVICE="/dev/${DEVBASE}"
 NUMBER=$(echo "${DEVBASE}" | sed 's/[^0-9]*//g')
@@ -21,34 +33,60 @@ echo ${DEVBASE}
 # See if this drive is already mounted, and if so where
 MOUNT_POINT=$(mount | grep ${DEVICE} | awk '{ print $3 }')
 
-if [[ -n ${MOUNT_POINT} ]]; then
-        ${log} "Warning: ${DEVICE} is already mounted at ${MOUNT_POINT}"
-        exit 1
-fi
 
-DEV_LABEL="cdrom"
+do_mount()
+{
+	if [[ -n ${MOUNT_POINT} ]]; then
+			${log} "Warning: ${DEVICE} is already mounted at ${MOUNT_POINT}"
+			exit 1
+	fi
 
-if [ ${NUMBER} -gt 0 ]; then
-    DEV_LABEL+="${NUMBER}"
-fi
+	DEV_LABEL="cdrom"
 
-MOUNT_POINT="/media/${DEV_LABEL}"
+	if [ ${NUMBER} -gt 0 ]; then
+		DEV_LABEL+="${NUMBER}"
+	fi
 
-${log} "Mount point: ${MOUNT_POINT}"
+	MOUNT_POINT="/media/${DEV_LABEL}"
 
-mkdir -p ${MOUNT_POINT}
+	${log} "Mount point: ${MOUNT_POINT}"
 
-# Global mount options 
-#OPTS="ro,nosuid,nodev,relatime,nojoliet,check=s,map=n,blocksize=2048,uid=1000,gid=1000,dmode=500,fmode=400,iocharset=utf8,uhelper=udisks2"
-OPTS=""
+	mkdir -p ${MOUNT_POINT}
 
-if ! mount -o ${OPTS} ${DEVICE} ${MOUNT_POINT}; then
-	${log} "Error mounting ${DEVICE} (status = $?)"
-	rmdir "${MOUNT_POINT}"
-	exit 1
-else
-	# Track the mounted drives
-	echo "${MOUNT_POINT}:${DEVBASE}" | cat >> "/var/log/cdrom-mount.track" 
-fi
+	if ! mount ${DEVICE} ${MOUNT_POINT}; then
+		${log} "Error mounting ${DEVICE} (status = $?)"
+		rmdir "${MOUNT_POINT}"
+		exit 1
+	else
+		# Track the mounted drives
+		echo "${MOUNT_POINT}:${DEVBASE}" | cat >> "/var/log/cdrom-mount.track" 
+	fi
 
-${log} "Mounted ${DEVICE} at ${MOUNT_POINT}"
+	${log} "Mounted ${DEVICE} at ${MOUNT_POINT}"
+}
+
+do_unmount()
+{
+    if [[ -z ${MOUNT_POINT} ]]; then
+        ${log} "Warning: ${DEVICE} is not mounted"
+    else
+        umount -l ${DEVICE}
+	${log} "Unmounted ${DEVICE} from ${MOUNT_POINT}"
+        /bin/rmdir "${MOUNT_POINT}"
+        sed -i.bak "\@${MOUNT_POINT}@d" /var/log/usb-mount.track
+    fi
+
+
+}
+
+case "${ACTION}" in
+    add)
+        do_mount
+        ;;
+    remove)
+        do_unmount
+        ;;
+    *)
+        usage
+        ;;
+esac
