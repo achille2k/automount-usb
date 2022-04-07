@@ -1,0 +1,6 @@
+[Unit]
+Description=Mount CDROM Drive on %i
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/local/bin/cdrom-mount.sh %i

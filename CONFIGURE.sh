@@ -6,9 +6,11 @@ PATH="$PATH:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin:/bin:/sbin"
 chmod 755 ./*.sh
 
 cp ./usb-mount.sh /usr/local/bin/
+cp ./cdrom-mount.sh /usr/local/bin/
 
-# Systemd unit file for USB automount/unmount 
+# Systemd unit file for USB/CDROM automount/unmount 
 cp ./usb-mount@.service /etc/systemd/system/usb-mount@.service
+cp ./cdrom-mount@.service /etc/systemd/system/cdrom-mount@.service
 
 # Create udev rule to start/stop usb-mount@.service on hotplug/unplug
 cat ./99-local.rules.usb-mount >> /etc/udev/rules.d/99-local.rules
