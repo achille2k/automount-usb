@@ -59,7 +59,7 @@ do_mount()
 		exit 1
 	else
 		# Track the mounted drives
-		echo "${MOUNT_POINT}:${DEVBASE}" | cat >> "/var/log/cdrom-mount.track" 
+		echo "${MOUNT_POINT}:${DEVBASE}"
 	fi
 
 	${log} "Mounted ${DEVICE} at ${MOUNT_POINT}"
@@ -73,7 +73,6 @@ do_unmount()
         umount -l ${DEVICE}
 	${log} "Unmounted ${DEVICE} from ${MOUNT_POINT}"
         /bin/rmdir "${MOUNT_POINT}"
-        sed -i.bak "\@${MOUNT_POINT}@d" /var/log/usb-mount.track
     fi
 
 

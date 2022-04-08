@@ -12,10 +12,6 @@ rm -f /usr/local/bin/cdrom-mount.sh
 rm -f /etc/systemd/system/usb-mount@.service
 rm -f /etc/systemd/system/cdrom-mount@.service
 
-# Remove the track files
-rm -f /var/log/usb-mount.track*
-rm -f /var/log/cdrom-mount.track*
-
 # Remove udev rule
 sed -i "/systemctl\sstart\susb-mount/d" /etc/udev/rules.d/99-local.rules
 sed -i "/systemctl\sstop\susb-mount/d" /etc/udev/rules.d/99-local.rules
