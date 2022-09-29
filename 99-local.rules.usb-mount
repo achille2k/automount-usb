@@ -2,9 +2,11 @@ KERNEL=="sd[a-z]*", SUBSYSTEMS=="usb", ACTION=="add", RUN+="/bin/systemctl start
 
 KERNEL=="sd[a-z]*", SUBSYSTEMS=="usb", ACTION=="remove", RUN+="/bin/systemctl stop usb-mount@%k.service"
 
-KERNEL=="sr[0-9]*", SUBSYSTEM=="block", ACTION=="change", ENV{ID_CDROM_MEDIA_STATE}=="appendable", RUN+="/bin/systemctl start cdrom-mount@%k.service"
+KERNEL=="sr[0-9]*", SUBSYSTEM=="block", ACTION=="change", ENV{ID_CDROM_MEDIA}=="1", RUN+="/bin/systemctl start cdrom-mount@%k.service"
 
-KERNEL=="sr[0-9]*", SUBSYSTEM=="block", ACTION=="change", ENV{ID_CDROM_MEDIA_STATE}=="complete", RUN+="/bin/systemctl start cdrom-mount@%k.service"
+#KERNEL=="sr[0-9]*", SUBSYSTEM=="block", ACTION=="change", ENV{ID_CDROM_MEDIA_STATE}=="appendable", RUN+="/bin/systemctl start cdrom-mount@%k.service"
+
+#KERNEL=="sr[0-9]*", SUBSYSTEM=="block", ACTION=="change", ENV{ID_CDROM_MEDIA_STATE}=="complete", RUN+="/bin/systemctl start cdrom-mount@%k.service"
 
 KERNEL=="sr[0-9]*", SUBSYSTEM=="block", ACTION=="change", ENV{DISK_EJECT_REQUEST}=="1", RUN+="/bin/systemctl stop cdrom-mount@%k.service"
 
